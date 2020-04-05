@@ -42,7 +42,9 @@ DJANGO_APPS = [
     'django.contrib.staticfiles',
 ]
 
-THIRD_PARTY_APPS = []
+THIRD_PARTY_APPS = [
+    'crispy_forms',
+]
 
 LOCAL_APPS = [
     'apps.users',
@@ -66,14 +68,26 @@ ROOT_URLCONF = 'config.urls'
 
 AUTH_USER_MODEL = "users.User"
 
+LOGIN_URL = "/"
+
+LOGIN_REDIRECT_URL = "/"
+
+LOGOUT_REDIRECT_URL = "/"
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [str(APPS_DIR / "templates")],
         'OPTIONS': {
             "loaders": [
-                "django.template.loaders.filesystem.Loader",
-                "django.template.loaders.app_directories.Loader",
+                ("pypugjs.ext.django.Loader",
+                    (
+                     "django.template.loaders.filesystem.Loader",
+                     "django.template.loaders.app_directories.Loader",
+                    ))
+            ],
+            'builtins': [
+                'pypugjs.ext.django.templatetags',
             ],
             'context_processors': [
                 "django.template.context_processors.debug",
@@ -85,6 +99,7 @@ TEMPLATES = [
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
                 "apps.utils.context_processors.settings_context",
+                "apps.utils.context_processors.sidebar",
             ],
         },
     },
