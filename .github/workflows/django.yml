@@ -17,8 +17,12 @@ jobs:
     services:
       postgres:
         image: postgres
+        ports:
+          - 5432:5432
         env:
-          POSTGRES_PASSWORD: passwordpostgres
+          POSTGRES_PASSWORD: "lerolero"
+          POSTGRES_DB: "colset_test"
+          POSTGRES_USER: "postgres"
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
