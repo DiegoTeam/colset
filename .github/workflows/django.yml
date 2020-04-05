@@ -4,7 +4,7 @@ on:
   push:
       branches:
         - develop
-      
+
   pull_request:
       branches:
         - develop
@@ -43,9 +43,9 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Django Testing project
       env:
-        DJANGO_DEBUG: ${{ secrets.DJANGO_DEBUG }}
         DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
         DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        DATABASE_TEST_URL: ${{ secrets.DATABASE_TEST_URL }}
 
       run: |
         python3 manage.py test
