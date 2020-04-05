@@ -16,19 +16,19 @@ jobs:
 
     services:
       postgres:
-        image: postgres
-        ports:
-          - 5432:5432
+        image: postgres:11
         env:
-          POSTGRES_PASSWORD: "lerolero"
-          POSTGRES_DB: "colset_test"
-          POSTGRES_USER: "postgres"
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: postgres
+        ports: ["5432:5432"]
         options: --health-cmd pg_isready --health-interval 10s --health-timeout 5s --health-retries 5
 
     steps:
 
-      - name: Check out repository code
-        uses: actions/checkout@v1
+      - uses: actions/checkout@v1
+          with:
+            fetch-depth: 1
 
       - name: Set up Python 3.7
         uses: actions/setup-python@v1
@@ -51,7 +51,7 @@ jobs:
       - name: Django Testing project
         env:
           DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
-          DATABASE_TEST_URL: ${{ secrets.DATABASE_TEST_URL }}
+          DATABASE_TEST_URL: 'postgres://postgres:postgres@localhost:${{ job.services.postgres.ports[5432] }}/postgres'
 
         run: |
           python3 manage.py test
