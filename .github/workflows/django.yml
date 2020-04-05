@@ -55,7 +55,6 @@ jobs:
     - name: Django Testing project
       env:
         DJANGO_SETTINGS_MODULE: ${{ secrets.DJANGO_SETTINGS_MODULE }}
-        DATABASE_URL: ${{ secrets.DATABASE_URL }}
         DATABASE_TEST_URL: ${{ secrets.DATABASE_TEST_URL }}
 
       run: |

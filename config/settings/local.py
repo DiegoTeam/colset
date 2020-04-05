@@ -33,5 +33,7 @@ DEBUG_TOOLBAR_CONFIG = {
 
 INTERNAL_IPS = ["127.0.0.1", "10.0.2.2"]
 
-if sys.argv[1] == 'test':
+if sys.argv[1] != 'test':
+    DATABASES = {"default": env.db("DATABASE_URL")}
+else:
     DATABASES = {"default": env.db("DATABASE_TEST_URL")}
