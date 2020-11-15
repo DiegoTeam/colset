@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 from __future__ import unicode_literals
-from django.contrib.postgres.fields import JSONField
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from apps.users.constants import USER_MSG_SUPERUSER_ERROR
@@ -59,7 +58,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=150)
     last_name = models.CharField(max_length=150)
     phone_number = models.CharField(max_length=25, blank=True, null=True)
-    extra_fields = JSONField(default=dict)
+    extra_fields = models.JSONField(default=dict)
 
     date_joined = models.DateTimeField(auto_now_add=True)
     last_online = models.DateTimeField(blank=True, null=True)
