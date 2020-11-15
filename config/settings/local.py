@@ -5,7 +5,7 @@ import sys
 DEBUG = True
 
 SECRET_KEY = env(
-    "DJANGO_SECRET_KEY",
+    "SECRET_KEY",
     default="JRiMtuME1uNOdfFQfX7YbtBsxe7MFu9hJNqlHc9TtZFC3MplxvwhqnrULD16rqXR",
 )
 

@@ -41,10 +41,14 @@ DJANGO_APPS = [
 
 THIRD_PARTY_APPS = [
     'crispy_forms',
+    'django_celery_results',
+    'django_celery_beat',
+    'channels'
 ]
 
 LOCAL_APPS = [
     'apps.users',
+    'apps.realtime'
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -103,6 +107,16 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'config.wsgi.application'
+ASGI_APPLICATION = 'config.routing.application'
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [env("CHANNEL_LAYER_HOSTS")]
+        },
+    },
+}
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
@@ -148,6 +162,18 @@ USE_L10N = True
 USE_TZ = True
 
 
+# CELERY
+
+CELERY_TIMEZONE = TIME_ZONE
+CELERY_BROKER_URL = env("CELERY_BROKER_URL")
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TASK_DEFAULT_QUEUE = env("CELERY_TASK_DEFAULT_QUEUE")
+
+
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
@@ -162,7 +188,7 @@ STATICFILES_FINDERS = [
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
 ]
 
-MEDIA_ROOT = str(APPS_DIR / "media")
+MEDIA_ROOT = str(ROOT_DIR / "media")
 
 MEDIA_URL = "/media/"
 
@@ -175,10 +201,6 @@ SECURE_BROWSER_XSS_FILTER = True
 X_FRAME_OPTIONS = "DENY"
 
 ADMIN_URL = "admin/"
-
-ADMINS = [("""Cristian Fonseca""", "cristian.lfs@gmail.com")]
-
-MANAGERS = ADMINS
 
 LOGGING = {
     "version": 1,

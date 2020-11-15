@@ -1,1 +1,4 @@
 -r ./base.txt
+
+gunicorn==20.0.4
+daphne==3.0.1

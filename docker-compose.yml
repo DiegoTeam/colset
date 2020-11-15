@@ -1,0 +1,121 @@
+version: '3.7'
+
+networks:
+  colset:
+    name: colset
+
+volumes:
+  staticfiles_volume:
+  colset_db_data:
+  media_volume:
+
+services:
+
+  db:
+    image: postgres:11.8
+    container_name: postgres
+    env_file:
+      - ./.envs/.production/db.env
+    volumes:
+      - colset_db_data:/var/lib/postgresql/data
+    networks:
+      - colset
+    restart: always
+
+  app:
+    build:
+      context: .
+      dockerfile: ./compose/production/django/Dockerfile
+    image: colset/app:latest
+    container_name: colset_app
+    env_file:
+      - ./.envs/.production/db.env
+      - ./.envs/.production/app.env
+    volumes:
+      - staticfiles_volume:/app/staticfiles
+      - media_volume:/app/media
+    restart: always
+    networks:
+      - colset
+    depends_on:
+      - db
+    command: /start
+
+  nginx:
+    build:
+      context: ./compose/production/nginx
+    container_name: nginx
+    restart: always
+    networks:
+      - colset
+    depends_on:
+      - app
+    volumes:
+      - staticfiles_volume:/app/staticfiles
+      - media_volume:/app/media
+    ports:
+      - 80:80
+
+  redis:
+    image: redis:latest
+    container_name: redis
+    restart: always
+    networks:
+      - colset
+
+  celeryworker:
+    image: colset/app:latest
+    container_name: celeryworker
+    restart: always
+    networks:
+      - colset
+    volumes:
+      - staticfiles_volume:/app/staticfiles
+      - media_volume:/app/media
+    env_file:
+      - ./.envs/.production/db.env
+      - ./.envs/.production/app.env
+    depends_on:
+      - app
+      - redis
+    command: /start-celeryworker
+
+  flower:
+    image: colset/app:latest
+    container_name: flower
+    restart: always
+    networks:
+      - colset
+    volumes:
+      - staticfiles_volume:/app/staticfiles
+      - media_volume:/app/media
+    depends_on:
+      - app
+      - redis
+      - nginx
+    env_file:
+      - ./.envs/.production/db.env
+      - ./.envs/.production/app.env
+    command: /start-flower
+
+  daphne:
+    image: colset/app:latest
+    container_name: daphne
+    restart: always
+    networks:
+      - colset
+    env_file:
+      - ./.envs/.production/db.env
+      - ./.envs/.production/app.env
+    command: /start-daphne
+
+  celerybeat:
+    image: colset/app:latest
+    container_name: celerybeat
+    env_file:
+      - ./.envs/.production/db.env
+      - ./.envs/.production/app.env
+    networks:
+      - colset
+    restart: always
+    command: /start-celerybeat

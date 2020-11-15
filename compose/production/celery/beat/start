@@ -1,0 +1,10 @@
+#!/bin/sh
+
+set -o errexit
+set -o nounset
+
+echo "----- REMOVE PID FILE -----"
+rm -f ./celerybeat.pid
+
+echo "----- STARTING BEAT -----"
+celery -A config.celery_app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler
