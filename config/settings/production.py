@@ -3,9 +3,6 @@ from .base import env
 
 DEBUG = False
 
-SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
-SOCIAL_AUTH_SANITIZE_REDIRECTS = False
-
 SECRET_KEY = env("SECRET_KEY")
 
 ALLOWED_HOSTS = env.list("ALLOWED_HOSTS")
