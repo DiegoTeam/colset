@@ -3,7 +3,7 @@
 from __future__ import unicode_literals
 from django import forms
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, ButtonHolder, Layout, Div
+from crispy_forms.layout import Submit, ButtonHolder, Layout, Div, HTML
 
 
 class LoginForm(forms.Form):
@@ -32,5 +32,18 @@ class LoginForm(forms.Form):
                     Submit('submit', 'Ingresar', css_class='btn btn-primary btn-block btn-lg')
                 ),
                 css_class="login-buttons"
+            ),
+            Div(
+                HTML(
+                    """
+                    <p class="text-center" style="margin-bottom:30px;margin-top:30px;">Tambien puedes ingresar usando tus redes sociales</p>
+                    <a href="{% url "social:begin" "facebook" %}" class="btn btn-social btn-block btn-lg btn-facebook text-center">
+                        <span class="fab fa-facebook-f"></span> Ingresar con Facebook
+                    </a>
+                    <a href="{% url "social:begin" "google-oauth2" %}" class="btn btn-social btn-block btn-lg btn-google text-center">
+                        <span class="fab fa-google"></span> Ingresar con Google
+                    </a>
+                    """
+                )
             )
         )

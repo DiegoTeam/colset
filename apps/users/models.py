@@ -4,6 +4,11 @@ from __future__ import unicode_literals
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 from apps.users.constants import USER_MSG_SUPERUSER_ERROR
+from config.extrafields import ContentTypeRestrictedFileField
+
+
+def upload_dinamic_dir(instance, filename):
+    return '/'.join(['Users', str(instance.id), filename])
 
 
 class UserManager(BaseUserManager):
@@ -60,6 +65,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     phone_number = models.CharField(max_length=25, blank=True, null=True)
     extra_fields = models.JSONField(default=dict)
 
+    photo = ContentTypeRestrictedFileField(upload_to=upload_dinamic_dir, blank=True,
+                                           content_types=['image/jpg', 'image/jpeg', 'image/png'],
+                                           max_upload_size=1048576)
+
     date_joined = models.DateTimeField(auto_now_add=True)
     last_online = models.DateTimeField(blank=True, null=True)
     last_login = models.DateTimeField(blank=True, null=True)
@@ -86,6 +95,14 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def get_full_name(self):
         return f"{self.first_name} {self.last_name}"
+
+    def url_photo(self):
+        url = None
+        try:
+            url = self.photo.url
+        except:
+            pass
+        return url
 
 
 class ContentTypeApp(models.Model):

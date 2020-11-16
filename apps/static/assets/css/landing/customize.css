@@ -1,0 +1,31 @@
+.home .home-content h2, .home .home-content h3, .home .home-content h4 {
+    color: gray;
+}
+
+.home .home-content .btn.btn-outline-white {
+    border-color: gray;
+}
+
+.btn-outline-white {
+    color: gray;
+    border-color: gray;
+}
+
+.carousel-item-principal {
+  height: 93vh;
+  background: no-repeat center center scroll;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+}
+
+.header .navbar-toggle {
+    border-color: transparent;
+    background: #dee2e6;
+}
+
+
+.header .navbar-toggle .icon-bar {
+    background: #6c757d;
+}

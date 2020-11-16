@@ -16,11 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
-from .views import Index, Login, Logout
+from .views import Index, Login, Logout, Landing
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('', Login.as_view(), name='login'),
+    path('', Landing.as_view(), name='landing'),
+    path('oauth/', include('social_django.urls', namespace='social')),
+    path('login/', Login.as_view(), name='login'),
     path('logout/', Logout.as_view(), name='logout'),
     path('dashboard/', Index.as_view(), name='index'),
     path('admin/', admin.site.urls),

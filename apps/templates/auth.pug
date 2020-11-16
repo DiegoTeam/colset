@@ -22,16 +22,7 @@ block body_content
                         span(class="icon-bar")
 
                     a(href="#", class="navbar-brand")
-                        b(class="mr-1")
-                            | Color
-                        | Admin
-                        span(class="navbar-logo")
-                            span(class="text-blue") G
-                            span(class="text-red") o
-                            span(class="text-orange") o
-                            span(class="text-blue") g
-                            span(class="text-green") l
-                            span(class="text-red") e
+                        img(src="{% static 'assets/img/colset.svg'%}", alt="Work 2", style="width:100px;max-height:70%;")
 
                     button(type="button",class="navbar-toggle",data-click="sidebar-toggled")
                         span(class="icon-bar")
@@ -41,11 +32,7 @@ block body_content
                 ul(class="navbar-nav d-flex flex-grow-1")
 
                     li(class="navbar-form flex-grow-1")
-                        form(action="",method="POST",name="search")
-                            div(class="form-group")
-                                input(type="text" class="form-control" placeholder="Try searching &quot;Users Today&quot;")
-                                button(type="submit" class="btn btn-search")
-                                    i(class="fa fa-search")
+
 
 
                     li(class="dropdown")
@@ -59,10 +46,16 @@ block body_content
 
                     li(class="dropdown navbar-user")
                         a(href="#",class="dropdown-toggle",data-toggle="dropdown")
-                            div(class="image image-icon bg-black text-grey-darker")
-                                i(class="material-icons") person
-                            span(class="d-none d-md-inline") {{ user.get_full_name }}
-                                b(class="caret ml-2")
+
+                            | {% if user.url_photo == None %}
+                            img(src="{% static 'assets/css/google/images/user.png'%}")
+                            | {% else %}
+                            img(src="{{ user.url_photo }}")
+                            | {% endif %}
+
+
+                            span(class="d-none d-md-inline") {{ user.first_name }}
+                            b(class="caret ml-1")
 
                         div(class="dropdown-menu dropdown-menu-right")
                             a(href="{% url 'logout' %}",class="dropdown-item") Cerrar sesión
@@ -76,12 +69,16 @@ block body_content
                         li(class="nav-profile")
                             a(href="#",data-toggle="nav-profile")
                                 div(class="cover with-shadow")
-                                div(class="image image-icon bg-black text-grey-darker")
-                                    i(class="material-icons") person
+                                div(class="image image-icon")
+                                    | {% if user.url_photo == None %}
+                                    img(src="{% static 'assets/css/google/images/user.png'%}")
+                                    | {% else %}
+                                    img(src="{{ user.url_photo }}")
+                                    | {% endif %}
                                 div(class="info")
                                     b(class="caret pull-right")
-                                    | {{ user.get_full_name }}
-                                    small User
+                                    | {{ user.first_name }}
+                                    small {{ user.email }}
 
                         li
                             ul(class="nav nav-profile")

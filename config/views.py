@@ -12,6 +12,17 @@ from django.contrib.auth import authenticate, login, logout
 from django.shortcuts import HttpResponseRedirect, reverse, redirect
 
 
+class Landing(TemplateView):
+
+    template_name = 'landing.pug'
+
+    def get_context_data(self, **kwargs):
+
+        kwargs['title'] = 'COLSET'
+        kwargs['usuarios_registrados'] = User.objects.all().count()
+        return super(Landing, self).get_context_data(**kwargs)
+
+
 class Login(FormView):
 
     template_name = 'login.pug'

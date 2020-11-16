@@ -43,7 +43,9 @@ THIRD_PARTY_APPS = [
     'crispy_forms',
     'django_celery_results',
     'django_celery_beat',
-    'channels'
+    'channels',
+    'social_django',
+    'django_cleanup.apps.CleanupConfig',
 ]
 
 LOCAL_APPS = [
@@ -52,6 +54,29 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+
+CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+AUTHENTICATION_BACKENDS = [
+    'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.facebook.FacebookOAuth2',
+    'django.contrib.auth.backends.ModelBackend'
+]
+
+SOCIAL_AUTH_PIPELINE = (
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+    'social_core.pipeline.user.get_username',
+    'social_core.pipeline.social_auth.associate_by_email',
+    'social_core.pipeline.user.create_user',
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
+    'config.pipeline.save_profile_picture',
+)
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -63,11 +88,13 @@ MIDDLEWARE = [
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "social_django.middleware.SocialAuthExceptionMiddleware",
 ]
 
 ROOT_URLCONF = 'config.urls'
 
 AUTH_USER_MODEL = "users.User"
+SOCIAL_AUTH_USER_MODEL = "users.User"
 
 LOGIN_URL = "/"
 
@@ -118,8 +145,6 @@ CHANNEL_LAYERS = {
     },
 }
 
-CRISPY_TEMPLATE_PACK = 'bootstrap4'
-
 # Database
 # https://docs.djangoproject.com/en/3.0/ref/settings/#databases
 
@@ -146,6 +171,25 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
 ]
+
+
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
+SOCIAL_AUTH_SANITIZE_REDIRECTS = True
+
+SOCIAL_AUTH_USER_FIELDS = ['email', 'first_name', 'last_name', 'password']
+SOCIAL_AUTH_LOGIN_REDIRECT_URL = 'index'
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = env('SOCIAL_AUTH_GOOGLE_OAUTH2_KEY')
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = env('SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET')
+
+SOCIAL_AUTH_FACEBOOK_KEY = env('SOCIAL_AUTH_FACEBOOK_KEY')
+SOCIAL_AUTH_FACEBOOK_SECRET = env('SOCIAL_AUTH_FACEBOOK_SECRET')
+SOCIAL_AUTH_FACEBOOK_API_VERSION = '2.12'
+SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+SOCIAL_AUTH_FACEBOOK_PROFILE_EXTRA_PARAMS = {
+  'locale': 'es_CO',
+  'fields': 'id, name, email, age_range'
+}
 
 
 # Internationalization

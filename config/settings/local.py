@@ -4,6 +4,9 @@ import sys
 
 DEBUG = True
 
+SOCIAL_AUTH_REDIRECT_IS_HTTPS = False
+SOCIAL_AUTH_SANITIZE_REDIRECTS = False
+
 SECRET_KEY = env(
     "SECRET_KEY",
     default="JRiMtuME1uNOdfFQfX7YbtBsxe7MFu9hJNqlHc9TtZFC3MplxvwhqnrULD16rqXR",
