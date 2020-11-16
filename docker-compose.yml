@@ -52,7 +52,6 @@ services:
     volumes:
       - staticfiles_volume:/app/staticfiles
       - media_volume:/app/media
-      - ./data/certs:/etc/nginx/certs
     ports:
       - 80:80
 
