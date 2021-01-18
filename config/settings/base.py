@@ -46,11 +46,13 @@ THIRD_PARTY_APPS = [
     'channels',
     'social_django',
     'django_cleanup.apps.CleanupConfig',
+    'rest_framework',
 ]
 
 LOCAL_APPS = [
     'apps.users',
-    'apps.realtime'
+    'apps.realtime',
+    'apps.users_profiles',
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -58,6 +60,17 @@ INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated'
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10
+}
+
+X_FRAME_OPTIONS = 'SAMEORIGIN'
+
 
 AUTHENTICATION_BACKENDS = [
     'social_core.backends.google.GoogleOAuth2',

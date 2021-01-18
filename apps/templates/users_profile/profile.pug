@@ -1,0 +1,451 @@
+extends ../generic_auth
+
+- load static
+
+block content_generic_auth
+    |{% verbatim %}
+    div(id="app")
+        div(class="card mb-4")
+            div(class="card-header")
+                strong Presentación:
+            div(class="card-body")
+                div(class="mb-2")
+                    form
+                        div(class="row")
+                            div(class="col")
+                                label(for="first_name", class="mr-2") Nombre(s):
+                                input(type="text", autocomplete="off", name="first_name", class="form-control mr-2", id="first_name", v-model="first_name")
+                            div(class="col")
+                                label(for="last_name", class="mr-2") Apellidos:
+                                input(type="text", autocomplete="off", name="last_name", class="form-control", id="last_name", v-model="last_name")
+
+
+
+        div(class="card mb-4")
+            div(class="card-header")
+                strong Acerca de mi
+            div(class="card-body")
+                div(class="mb-2")
+                    label(for="exampleFormControlTextarea1", class="form-label") Resumen:
+                    textarea(v-model="about", class="form-control", id="exampleFormControlTextarea1", rows="5")
+
+        div(class="card mb-4")
+            div(class="card-header")
+                strong Experiencia:
+                span(data-toggle="modal", data-target="#modal", @click="OpenModal")
+                    a(href="#", class="btn btn-success btn-icon btn-circle float-right", data-toggle="tooltip", data-placement="left", title="Agregar experiencia")
+                        i(class="fa fa-plus", style="font-size:12px;")
+            div(class="card-body")
+                p(v-show="experiences.length === 0") Por favor agrega experiencias laborales en tu perfil.
+
+                div(v-for="(experience, index) in experiences", :key="index")
+
+                    div(class="widget-list widget-list-rounded m-b-10")
+                        div(class="widget-list-item")
+                            div(class="widget-list-media")
+                                img(:src="user_image", class="rounded")
+                            div(class="widget-list-content")
+                                h4(class="widget-list-title")
+                                    strong {{ experience.charge }}
+                                div(class="widget-list-desc")
+                                    div
+                                        span
+                                            strong {{ experience.company }} - {{ experience.job_type }}
+                                    div
+                                        span {{ experience.init_date }} - {{ experience.end_date }}
+                                    div
+                                        span {{ experience.location }}
+
+                            div(class="widget-list-action")
+                                a(href="#", data-toggle="dropdown", class="text-muted pull-right")
+                                    i(class="fa fa-ellipsis-h f-s-14")
+                                ul(class="dropdown-menu dropdown-menu-right")
+                                    a(href="#", class="dropdown-item", @click="editExperience(index)") Editar
+                                    a(href="#", class="dropdown-item", @click="removeExperience(index)") Eliminar
+
+
+
+
+        div(class="modal fade", id="modal")
+            form(data-parsley-validate="true", v-on:submit.prevent="onSubmitExperience", id="experienceform")
+                div(class="modal-dialog modal-lg")
+                    div(class="modal-content")
+                        div(class="modal-header")
+                            h4(class="modal-title") Experiencia
+                            button(type="button", class="close", data-dismiss="modal", aria-hidden="true") ×
+                        div(class="modal-body")
+
+                            div(class="mb-2 hide")
+                                label(for="index") Index:
+                                input(type="number", autocomplete="off", name="index", class="form-control", id="index")
+
+                            div(class="mb-2")
+                                label(for="charge") Cargo:
+                                input(type="text", autocomplete="off", name="charge", class="form-control", id="charge", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+                            div(class="mb-2")
+                                label(for="job_type") Tipo de empleo:
+                                select(name="job_type", autocomplete="false", class="form-control", id="job_type", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+                                    option(v-for="job in jobs_types", :value="job") {{job}}
+
+                            div(class="mb-2")
+                                label(for="company") Empresa:
+                                input(type="text", autocomplete="off", name="company", class="form-control", id="company", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+                            div(class="mb-2")
+                                label(for="location") Ubicación:
+                                input(type="text", autocomplete="off", name="location", class="form-control", id="location", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+                            div(class="mb-4")
+                                label(for="init_date") Fecha de inicio:
+                                input(type="text", onkeydown="return false", autocomplete="off", name="init_date", class="form-control", id="init_date", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+                            div(class="mb-4 checkbox checkbox-css")
+                                input(type="checkbox", name="now", class="form-control", id="now", v-model="checked_experience_now")
+                                label(class="form-check-label", for="now") Actualmente tengo este cargo:
+
+                            div(class="mb-2",v-show="checked_experience_now == false")
+                                label(for="end_date") Fecha de finalización:
+                                input(type="text", onkeydown="return false", autocomplete="off", name="end_date", class="form-control", id="end_date")
+
+                            div(class="mb-2")
+                                label(for="description") Descripción:
+                                textarea(autocomplete="off", name="description", class="form-control", id="description", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+
+                        div(class="modal-footer")
+                            button(type="submit", class="btn btn-success") Guardar
+
+
+
+
+
+        div(class="card mb-3")
+            div(class="card-header")
+                strong Educación:
+                span(data-toggle="modal", data-target="#modalEducation", @click="OpenModalEducation")
+                    a(href="#", class="btn btn-success btn-icon btn-circle float-right", data-toggle="tooltip", data-placement="left", title="Agregar educación")
+                        i(class="fa fa-plus", style="font-size:12px;")
+            div(class="card-body")
+                p(v-show="educations.length === 0") Por favor agrega registros de educación.
+
+                div(v-for="(education, index_education) in educations", :key="index_education")
+
+                    div(class="widget-list widget-list-rounded m-b-10")
+                        div(class="widget-list-item")
+                            div(class="widget-list-media")
+                                img(:src="user_image", class="rounded")
+                            div(class="widget-list-content")
+                                h4(class="widget-list-title")
+                                    strong {{ education.university }}
+                                div(class="widget-list-desc")
+                                    div
+                                        span
+                                            strong {{ education.title }}
+                                    div
+                                        span {{ education.init_date_education }} - {{ education.end_date_education }}
+
+                            div(class="widget-list-action")
+                                a(href="#", data-toggle="dropdown", class="text-muted pull-right")
+                                    i(class="fa fa-ellipsis-h f-s-14")
+                                ul(class="dropdown-menu dropdown-menu-right")
+                                    a(href="#", class="dropdown-item", @click="editEducation(index_education)") Editar
+                                    a(href="#", class="dropdown-item", @click="removeEducation(index_education)") Eliminar
+
+
+
+
+        div(class="modal fade", id="modalEducation")
+            form(data-parsley-validate="true", v-on:submit.prevent="onSubmitEducation", id="educationform")
+                div(class="modal-dialog modal-lg")
+                    div(class="modal-content")
+                        div(class="modal-header")
+                            h4(class="modal-title") Educación
+                            button(type="button", class="close", data-dismiss="modal", aria-hidden="true") ×
+                        div(class="modal-body")
+
+                            div(class="mb-2 hide")
+                                label(for="indexEducation") Index:
+                                input(type="number", autocomplete="off", name="indexEducation", class="form-control", id="indexEducation")
+
+                            div(class="mb-2")
+                                label(for="university") Universidad:
+                                input(type="text", autocomplete="off", name="university", class="form-control", id="university", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+                            div(class="mb-2")
+                                label(for="title") Título:
+                                input(type="text", autocomplete="off", name="title", class="form-control", id="title", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+                            div(class="mb-2")
+                                label(for="discipline") Disciplina académica:
+                                input(type="text", autocomplete="off", name="discipline", class="form-control", id="discipline", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+                            div(class="mb-4")
+                                label(for="init_date_education") Fecha de inicio:
+                                input(type="text", onkeydown="return false", autocomplete="off", name="init_date_education", class="form-control", id="init_date_education", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+
+                            div(class="mb-2")
+                                label(for="end_date_education") Fecha de finalización (o fecha prevista):
+                                input(type="text", onkeydown="return false", autocomplete="off", name="end_date_education", class="form-control", id="end_date_education", data-parsley-required="true", data-parsley-required-message="Este campo es requerido")
+
+
+                        div(class="modal-footer")
+                            button(type="submit", class="btn btn-success") Guardar
+
+
+
+
+        div(class="card mb-3")
+            div(class="card-header")
+                strong Hoja de vida:
+                a(:href="url_cv", class="btn btn-success btn-icon btn-circle float-right", data-toggle="tooltip", data-placement="left", title="Agregar PDF")
+                    i(class="fa fa-plus", style="font-size:12px;")
+            div(class="card-body")
+                div(class="mb-2")
+                    embed(:src="cv_url",type="application/pdf",width="100%",height="500px")
+
+
+        button(type="submit", class="btn btn-success mb-3", @click="saveChanges", data-click="swal-success") Guardar cambios
+    | {% endverbatim %}
+
+block generic_auth_script
+
+    script.
+
+        var app = new Vue({
+            el: "#app",
+            data: {
+                csrf_token: "{{ csrf_token }}",
+                api_profile: "{% url 'users_profile:users_profile_api:profile' %}",
+                url_cv: "{% url 'users_profile:cv' %}",
+                cv_url: "{{user.profile.url_cv}}",
+                first_name: "{{user.first_name}}",
+                last_name: "{{user.last_name}}",
+                about: "{{profile.about}}",
+                checked_experience_now: true,
+                user_image: "{% static 'assets/css/google/images/user.png' %}",
+                jobs_types: [
+                    "",
+                    "Jornada completa",
+                    "Jornada parcial",
+                    "Autónomo",
+                    "Profesional independiente",
+                    "Contrato temporal",
+                    "Contrato de prácticas",
+                    "Contrato de formación",
+                    "Seasonal"
+                ],
+                experiences: [],
+                educations: [],
+            },
+            methods: {
+                onSubmitExperience(){
+
+                    if($('#experienceform').parsley().isValid()){
+                        var experience = $('#experienceform').serializeArray().reduce(function (obj, item) {
+                            obj[item.name] = item.value;
+                            return obj;
+                        }, {});
+
+
+                        if(experience["index"] === ""){
+                            delete experience["index"]
+                            this.experiences.push(experience)
+                        }
+                        else{
+                            var index = experience["index"]
+                            delete experience["index"]
+                            this.$set(this.experiences, index, experience);
+                        }
+
+                        $('#experienceform').trigger("reset");
+                        $('#modal').modal('toggle');
+
+                    }
+                },
+                onSubmitEducation() {
+
+                    if ($('#educationform').parsley().isValid()) {
+                        var education = $('#educationform').serializeArray().reduce(function (obj, item) {
+                            obj[item.name] = item.value;
+                            return obj;
+                        }, {});
+
+                        if (education["indexEducation"] === "") {
+                            delete education["indexEducation"]
+                            this.educations.push(education)
+                        } else {
+                            var index = education["indexEducation"]
+                            delete education["indexEducation"]
+                            this.$set(this.educations, index, education);
+                        }
+
+                        $('#educationform').trigger("reset");
+                        $('#modalEducation').modal('toggle');
+
+                    }
+                },
+                removeExperience(index) {
+                    this.experiences.splice(index, 1)
+                },
+
+                removeEducation(index) {
+                    this.educations.splice(index, 1)
+                },
+                editExperience(index) {
+                    var data = this.experiences[index]
+
+                    $('#index').val(index);
+
+                    for(var key in data){
+                        $("#" + key).val(data[key]);
+                    }
+
+                    $('#modal').modal('toggle');
+                    $('#experienceform').parsley().reset();
+
+                },
+                editEducation(index) {
+                    var data = this.educations[index]
+
+                    $('#indexEducation').val(index);
+
+                    for (var key in data) {
+                        $("#" + key).val(data[key]);
+                    }
+
+                    $('#modalEducation').modal('toggle');
+                    $('#educationform').parsley().reset();
+
+                },
+                OpenModal(){
+                    $('#experienceform').parsley().reset();
+                },
+                OpenModalEducation() {
+                    $('#educationform').parsley().reset();
+                },
+                saveChanges(){
+
+                    var data = {
+                        about: this.about,
+                        first_name: this.first_name,
+                        last_name: this.last_name,
+                        experience: JSON.stringify(this.experiences),
+                        education: JSON.stringify(this.educations),
+                    }
+
+                    $.ajax({
+                        type: "POST",
+                        url: this.api_profile,
+                        headers:{
+                            "X-CSRFToken": this.csrf_token
+                        },
+                        data: data,
+                        success: function (result){
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'success',
+                                title: 'El perfil se ha actualizado correctamente',
+                                showConfirmButton: true,
+                            })
+                        },
+                        error: function (result) {
+                            Swal.fire({
+                                position: 'center',
+                                icon: 'error',
+                                title: 'Revise todos los campos',
+                                showConfirmButton: true,
+                            })
+                        }
+                    });
+                }
+            }
+        });
+
+    script.
+        $(document).ready(function () {
+
+            app.experiences = JSON.parse('{{ experiences }}'.replace(/&quot;/g,'"'))
+            app.educations = JSON.parse('{{ educations }}'.replace(/&quot;/g,'"'))
+
+            $('#init_date').datepicker({
+                yearRange: "-50:+0",
+                showButtonPanel: false,
+                dateFormat: 'MM yy',
+                changeMonth: true,
+                changeYear: true,
+                todayHighlight: true,
+                autoclose: true,
+                closeText: 'Cerrar',
+                prevText: '<Ant',
+                nextText: 'Sig>',
+                currentText: 'Hoy',
+                monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+                dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+                weekHeader: 'Sm',
+            });
+
+            $('#end_date').datepicker({
+                yearRange: "-50:+0",
+                showButtonPanel: false,
+                dateFormat: 'MM yy',
+                changeMonth: true,
+                changeYear: true,
+                todayHighlight: true,
+                autoclose: true,
+                closeText: 'Cerrar',
+                prevText: '<Ant',
+                nextText: 'Sig>',
+                currentText: 'Hoy',
+                monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+                dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+                weekHeader: 'Sm',
+            });
+
+            $('#init_date_education').datepicker({
+                yearRange: "-50:+0",
+                showButtonPanel: false,
+                dateFormat: 'MM yy',
+                changeMonth: true,
+                changeYear: true,
+                todayHighlight: true,
+                autoclose: true,
+                closeText: 'Cerrar',
+                prevText: '<Ant',
+                nextText: 'Sig>',
+                currentText: 'Hoy',
+                monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+                dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+                weekHeader: 'Sm',
+            });
+
+            $('#end_date_education').datepicker({
+                yearRange: "-50:+0",
+                showButtonPanel: false,
+                dateFormat: 'MM yy',
+                changeMonth: true,
+                changeYear: true,
+                todayHighlight: true,
+                autoclose: true,
+                closeText: 'Cerrar',
+                prevText: '<Ant',
+                nextText: 'Sig>',
+                currentText: 'Hoy',
+                monthNames: ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'],
+                monthNamesShort: ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'],
+                dayNames: ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+                dayNamesShort: ['Dom', 'Lun', 'Mar', 'Mié', 'Juv', 'Vie', 'Sáb'],
+                dayNamesMin: ['Do', 'Lu', 'Ma', 'Mi', 'Ju', 'Vi', 'Sá'],
+                weekHeader: 'Sm',
+            });
+        });

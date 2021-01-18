@@ -1,0 +1,14 @@
+extends ../generic_auth
+
+- load static
+- load crispy_forms_tags
+
+block content_generic_auth
+    |{% crispy form %}
+
+block generic_auth_script
+
+    script.
+        $(document).ready(function () {
+
+        });

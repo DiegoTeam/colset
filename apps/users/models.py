@@ -1,8 +1,7 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-from __future__ import unicode_literals
-from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
+from django.db import models
+
+from apps.common.models import BaseModel
 from apps.users.constants import USER_MSG_SUPERUSER_ERROR
 from config.extrafields import ContentTypeRestrictedFileField
 
